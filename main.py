@@ -54,6 +54,15 @@ app = FastAPI(
     version="1.0.0"
 )
 
+# Настройка CORS
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["http://localhost:5173"],  # Разрешаем запросы с фронтенда
+    allow_credentials=True,
+    allow_methods=["*"],  # Разрешаем все методы
+    allow_headers=["*"],  # Разрешаем все заголовки
+)
+
 class CharsetMiddleware(BaseHTTPMiddleware):
     async def dispatch(self, request, call_next):
         response = await call_next(request)
