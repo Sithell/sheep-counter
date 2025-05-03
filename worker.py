@@ -7,6 +7,7 @@ from job_queue import get_next_queued_job, update_job
 from model import get_model
 from PIL import Image
 from typing import Dict
+from datetime import datetime, timedelta
 
 UPLOAD_DIR = 'uploads'
 PROCESSED_DIR = 'static'
@@ -26,6 +27,9 @@ def process_job(job):
     
     # Обновляем статус на processing
     update_job(job_id, status='processing')
+    
+    # Засекаем время начала обработки
+    start_time = datetime.now()
     
     model = get_model()
     results = model(input_path)
@@ -70,15 +74,21 @@ def process_job(job):
     else:
         im0.save(output_path)
     
+    # Вычисляем длительность обработки
+    duration = datetime.now() - start_time
+    
     # Обновляем задачу с результатом
     update_job(
         job_id,
         status='done',
         result={
             'sheep_count': len(boxes),
-            'image': f'/static/{job_id}.jpg'
+            'image': f'/static/{job_id}.jpg',
+            'duration': duration.microseconds // 1000
         }
     )
+    
+    print(f"Job {job_id} done. Duration: {duration}ms")
 
 def main():
     """Основной цикл обработки задач."""
@@ -89,7 +99,6 @@ def main():
             print(f"Processing job {job['id']} ({job['filename']})...")
             try:
                 process_job(job)
-                print(f"Job {job['id']} done.")
             except Exception as e:
                 print(f"Error processing job {job['id']}: {e}")
                 update_job(job['id'], status='error', result={'error': str(e)})

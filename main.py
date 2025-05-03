@@ -11,6 +11,7 @@ from starlette.responses import Response
 from enum import Enum
 from typing import Optional, Dict, List, Union
 from pydantic import BaseModel, Field
+from datetime import datetime, timedelta
 import aiofiles
 import os
 from job_queue import add_job, get_job, get_all_jobs
@@ -26,6 +27,7 @@ class DetectionResult(BaseModel):
     """Результат обработки изображения."""
     sheep_count: int = Field(description="Количество найденных овец")
     image: str = Field(description="URL обработанного изображения")
+    duration: int = Field(description="Время обработки в миллисекундах")
 
 class JobError(BaseModel):
     """Информация об ошибке при обработке."""
@@ -36,6 +38,7 @@ class Job(BaseModel):
     id: str = Field(description="Уникальный идентификатор задачи")
     filename: str = Field(description="Имя загруженного файла")
     status: JobStatus = Field(description="Текущий статус задачи")
+    created_at: datetime = Field(description="Время создания задачи")
     result: Optional[Union[DetectionResult, JobError]] = Field(
         None,
         description="Результат обработки или информация об ошибке"
@@ -124,6 +127,7 @@ async def create_job(
         id=job_id,
         filename=filename,
         status=JobStatus.QUEUED,
+        created_at=datetime.now(),
         result=None
     )
 

@@ -13,7 +13,7 @@ COPY main.py worker.py model.py job_queue.py yolo11n.pt ./
 RUN mkdir -p uploads static
 
 # Создание пустого файла очереди
-RUN echo '[]' > jobs.json
+RUN echo '{}' > jobs.json
 
 # Запуск сервера и воркера
 CMD ["sh", "-c", "python worker.py & uvicorn main:app --host 0.0.0.0 --port 8000"] 

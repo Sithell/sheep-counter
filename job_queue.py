@@ -1,58 +1,61 @@
+"""
+Очередь задач для обработки изображений.
+"""
 import json
+import os
 import uuid
-import threading
-from typing import Optional, Dict, Any, List
+from datetime import datetime
+from typing import Dict, List, Optional
 
 JOBS_FILE = 'jobs.json'
-LOCK = threading.Lock()
 
-def load_jobs() -> List[Dict[str, Any]]:
-    with LOCK:
-        try:
-            with open(JOBS_FILE, 'r') as f:
-                return json.load(f)
-        except (FileNotFoundError, json.JSONDecodeError):
-            return []
+def load_jobs() -> Dict[str, dict]:
+    """Загружает список задач из файла."""
+    if os.path.exists(JOBS_FILE):
+        with open(JOBS_FILE, 'r', encoding='utf-8') as f:
+            return json.load(f)
+    return {}
 
-def save_jobs(jobs: List[Dict[str, Any]]):
-    with LOCK:
-        with open(JOBS_FILE, 'w') as f:
-            json.dump(jobs, f, indent=2)
+def save_jobs(jobs: Dict[str, dict]) -> None:
+    """Сохраняет список задач в файл."""
+    with open(JOBS_FILE, 'w', encoding='utf-8') as f:
+        json.dump(jobs, f, ensure_ascii=False, indent=2)
 
 def add_job(filename: str) -> str:
+    """Добавляет новую задачу в очередь."""
     jobs = load_jobs()
     job_id = str(uuid.uuid4())
-    job = {
+    jobs[job_id] = {
         'id': job_id,
         'filename': filename,
         'status': 'queued',
+        'created_at': datetime.now().isoformat(),
         'result': None
     }
-    jobs.append(job)
     save_jobs(jobs)
     return job_id
 
-def update_job(job_id: str, **kwargs):
+def get_job(job_id: str) -> Optional[dict]:
+    """Возвращает информацию о задаче по её идентификатору."""
     jobs = load_jobs()
-    for job in jobs:
-        if job['id'] == job_id:
-            job.update(kwargs)
-            break
-    save_jobs(jobs)
+    return jobs.get(job_id)
 
-def get_job(job_id: str) -> Optional[Dict[str, Any]]:
+def get_all_jobs() -> List[dict]:
+    """Возвращает список всех задач."""
     jobs = load_jobs()
-    for job in jobs:
-        if job['id'] == job_id:
-            return job
-    return None
+    return list(jobs.values())
 
-def get_all_jobs() -> List[Dict[str, Any]]:
-    return load_jobs()
-
-def get_next_queued_job() -> Optional[Dict[str, Any]]:
+def update_job(job_id: str, **kwargs) -> None:
+    """Обновляет информацию о задаче."""
     jobs = load_jobs()
-    for job in jobs:
+    if job_id in jobs:
+        jobs[job_id].update(kwargs)
+        save_jobs(jobs)
+
+def get_next_queued_job() -> Optional[dict]:
+    """Возвращает следующую задачу в очереди."""
+    jobs = load_jobs()
+    for job in jobs.values():
         if job['status'] == 'queued':
             return job
     return None 
