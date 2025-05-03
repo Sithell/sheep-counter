@@ -54,13 +54,13 @@ def process_job(job):
         import cv2
         import numpy as np
         img = cv2.cvtColor(np.array(im0), cv2.COLOR_RGB2BGR)
-        font_scale = 1.0
-        thickness = 2
+        font_scale = 0.5
+        thickness = 1
         
         for box, conf in zip(boxes, confidences):
             x1, y1, x2, y2 = map(int, box)
             cv2.rectangle(img, (x1, y1), (x2, y2), (0,255,0), 2)
-            label = f'Sheep: {conf:.2f}'
+            label = f'{conf:.2f}'
             
             cv2.putText(
                 img, label, (x1, y1-10),
