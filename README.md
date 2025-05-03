@@ -81,6 +81,13 @@ curl "http://localhost:8000/job?id=<job_id>"
 http://localhost:8000/static/<job_id>.jpg
 ```
 
+## Документация API
+
+API имеет полную OpenAPI (Swagger) спецификацию, доступную по следующим URL:
+
+- **Swagger UI** (интерактивная документация):  
+  http://localhost:8000/docs
+
 ## Примечания
 
 - Убедитесь, что файл с весами модели (`*.pt`) находится в корне проекта.

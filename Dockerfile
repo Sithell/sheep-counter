@@ -4,10 +4,10 @@ WORKDIR /app
 
 # Установка зависимостей
 COPY requirements.txt .
-RUN pip install --no-cache-dir -r requirements.txt
+RUN pip install -r requirements.txt
 
 # Копирование кода
-COPY main.py worker.py model.py job_queue.py ./
+COPY main.py worker.py model.py job_queue.py yolo11n.pt ./
 
 # Создание папок для файлов
 RUN mkdir -p uploads static
