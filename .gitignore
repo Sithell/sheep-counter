@@ -1,0 +1,30 @@
+# Виртуальное окружение
+venv/
+env/
+.venv/
+
+# Кэш Python
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Логи и временные файлы
+*.log
+*.tmp
+
+# Загруженные и обработанные файлы
+uploads/
+static/
+
+# Файлы IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+.DS_store
+
+# Файл очереди задач
+jobs.json
+
+# Модель YOLO
+*.pt
