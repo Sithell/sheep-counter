@@ -14,8 +14,8 @@ os.makedirs(PROCESSED_DIR, exist_ok=True)
 
 SLEEP_TIME = 2  # секунд между проверками очереди
 
-# Класс овцы в COCO: 19 (sheep)
-SHEEP_CLASS_ID = 19
+# Класс овцы в COCO: 18 (sheep)
+SHEEP_CLASS_ID = 18
 
 def process_job(job):
     """Обработка одной задачи."""
