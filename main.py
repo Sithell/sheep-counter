@@ -4,6 +4,10 @@ FastAPI сервер для обработки изображений с пом�
 from fastapi import FastAPI, UploadFile, File, HTTPException, Query
 from fastapi.responses import FileResponse
 from fastapi.staticfiles import StaticFiles
+from fastapi.openapi.utils import get_openapi
+from fastapi.middleware.cors import CORSMiddleware
+from starlette.middleware.base import BaseHTTPMiddleware
+from starlette.responses import Response
 from enum import Enum
 from typing import Optional, Dict, List, Union
 from pydantic import BaseModel, Field
@@ -49,6 +53,37 @@ app = FastAPI(
     description="API для детекции объектов на изображениях с помощью YOLO",
     version="1.0.0"
 )
+
+class CharsetMiddleware(BaseHTTPMiddleware):
+    async def dispatch(self, request, call_next):
+        response = await call_next(request)
+        if "Content-Type" in response.headers:
+            if "application/json" in response.headers["Content-Type"]:
+                response.headers["Content-Type"] = "application/json; charset=utf-8"
+        return response
+
+app.add_middleware(CharsetMiddleware)
+
+def custom_openapi():
+    if app.openapi_schema:
+        return app.openapi_schema
+    
+    openapi_schema = get_openapi(
+        title=app.title,
+        version=app.version,
+        description=app.description,
+        routes=app.routes,
+    )
+    
+    # Устанавливаем кодировку UTF-8
+    openapi_schema["info"]["x-logo"] = {
+        "url": "https://fastapi.tiangolo.com/img/logo-margin/logo-teal.png"
+    }
+    
+    app.openapi_schema = openapi_schema
+    return app.openapi_schema
+
+app.openapi = custom_openapi
 
 # Раздача обработанных изображений
 app.mount("/static", StaticFiles(directory="static"), name="static")
