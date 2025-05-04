@@ -150,13 +150,15 @@ def get_job_status(
     "/jobs",
     response_model=JobsResponse,
     summary="Получить список задач",
-    description="Возвращает список задач с пагинацией"
+    description="Возвращает список задач с пагинацией, отсортированный по дате создания (новые сначала)"
 )
 def list_jobs(
     limit: int = Query(10, ge=1, le=100, description="Количество задач на странице"),
     offset: int = Query(0, ge=0, description="Смещение от начала списка")
 ) -> JobsResponse:
     all_jobs = get_all_jobs()
+    # Сортируем по created_at в обратном порядке (новые сначала)
+    all_jobs.sort(key=lambda x: x['created_at'], reverse=True)
     total = len(all_jobs)
     jobs = all_jobs[offset:offset + limit]
     return JobsResponse(
