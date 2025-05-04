@@ -5,3 +5,4 @@ ultralytics
 python-multipart
 pillow
 opencv-python 
+reportlab

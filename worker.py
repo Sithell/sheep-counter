@@ -9,6 +9,8 @@ from PIL import Image
 from typing import Dict
 from datetime import datetime, timedelta
 
+from report import generate_report
+
 UPLOAD_DIR = 'uploads'
 PROCESSED_DIR = 'static'
 os.makedirs(PROCESSED_DIR, exist_ok=True)
@@ -77,6 +79,15 @@ def process_job(job):
     # Вычисляем длительность обработки
     duration = datetime.now() - start_time
     
+    generate_report(
+        image_path=output_path,
+        original_filename=filename,
+        num_sheep=len(boxes),
+        timestamp=datetime.fromisoformat(job['created_at']),
+        duration_seconds=duration.microseconds / 1000000,
+        output_path=os.path.join(PROCESSED_DIR, f"{job_id}.pdf")
+    )
+
     # Обновляем задачу с результатом
     update_job(
         job_id,
@@ -84,6 +95,7 @@ def process_job(job):
         result={
             'sheep_count': len(boxes),
             'image': f'/static/{job_id}.jpg',
+            'report': f'/static/{job_id}.pdf',
             'duration': duration.microseconds // 1000
         }
     )

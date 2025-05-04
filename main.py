@@ -27,6 +27,7 @@ class DetectionResult(BaseModel):
     """Результат обработки изображения."""
     sheep_count: int = Field(description="Количество найденных овец")
     image: str = Field(description="URL обработанного изображения")
+    report: str = Field(description="URL отчета об обработке")
     duration: int = Field(description="Время обработки в миллисекундах")
 
 class JobError(BaseModel):
